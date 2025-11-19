@@ -32,27 +32,36 @@ Even with tiny parameter counts, cosine LR decay + AdamW betas (0.9, 0.95) stabi
 
 Official GPT literature specifies tiered configurations. We provide representative presets (you can override them via the CLI):
 
-```latex
-\begin{array}{l|c|c|c|c}
-\textbf{GPT-2 Tier} & \text{Layers} & \text{Heads} & d_{\text{model}} & \text{Params (approx.)} \\
-\hline
-\text{Small} & 12 & 12 & 768 & 117\text{M} \\
-\text{Medium} & 24 & 16 & 1024 & 345\text{M} \\
-\text{Large} & 36 & 20 & 1280 & 774\text{M} \\
-\text{XL} & 48 & 25 & 1600 & 1.5\text{B}
-\end{array}
-```
 
-```latex
-\begin{array}{l|c|c|c|c}
-\textbf{GPT-3 Tier} & \text{Layers} & \text{Heads} & d_{\text{model}} & \text{Params (approx.)} \\
-\hline
-\text{Ada} & 12 & 12 & 768 & 350\text{M} \\
-\text{Babbage} & 24 & 16 & 1024 & 1.3\text{B} \\
-\text{Curie} & 48 & 32 & 2048 & 6.7\text{B} \\
-\text{Davinci} & 96 & 96 & 12288 & 175\text{B}
-\end{array}
-```
+<div align="center">
+
+### **GPT-2 Tier**
+
+| **Model** | **Layers** | **Heads** | **d<sub>model</sub>** | **Params** |
+|----------|-----------:|-----------:|-----------------------:|-----------:|
+| Small    | 12 | 12 | 768  | 117M |
+| Medium   | 24 | 16 | 1024 | 345M |
+| Large    | 36 | 20 | 1280 | 774M |
+| XL       | 48 | 25 | 1600 | 1.5B |
+
+</div>
+
+---
+
+<div align="center">
+
+### **GPT-3 Tier**
+
+| **Model** | **Layers** | **Heads** | **d<sub>model</sub>** | **Params** |
+|----------|-----------:|-----------:|-----------------------:|-----------:|
+| Ada      | 12 | 12 | 768   | 350M |
+| Babbage  | 24 | 16 | 1024  | 1.3B |
+| Curie    | 48 | 32 | 2048  | 6.7B |
+| Davinci  | 96 | 96 | 12288 | 175B |
+
+</div>
+
+---
 
 Translating these tiers into code is straightforward; for example, a mid-sized GPT-2 using our modules:
 
@@ -67,7 +76,22 @@ model = GPT2(
 ).to(device)
 ```
 
-Similarly, a GPT-3 “Curie” approximation would leverage the `GPT3` class with `n_layer=48`, `n_head=32`, `d_model=2048`, and `mlp_expansion=4`. All parameters are exposed through `scripts/train.py` so you can mix-and-match presets with your hardware budget.
+An equivalent GPT-3 “Curie”-style configuration in this repo looks like:
+
+```python
+model = GPT3(
+    vocab_size=vocab_size,
+    block_size=block_size,
+    n_layer=48,
+    n_head=32,
+    d_model=2048,
+    dropout=0.1,
+    mlp_expansion=4,
+    resid_dropout=0.1,
+).to(device)
+```
+
+All parameters are exposed through `scripts/train.py`, so you can mix-and-match presets with your hardware budget.
 
 ## Installation
 

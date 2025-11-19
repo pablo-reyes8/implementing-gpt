@@ -1,5 +1,13 @@
 # GPT Language Modeling Suite
 
+![Repo size](https://img.shields.io/github/repo-size/pablo-reyes8/implementing-gpt)
+![Last commit](https://img.shields.io/github/last-commit/pablo-reyes8/implementing-gpt)
+![Open issues](https://img.shields.io/github/issues/pablo-reyes8/implementing-gpt)
+![Contributors](https://img.shields.io/github/contributors/pablo-reyes8/implementing-gpt)
+![Forks](https://img.shields.io/github/forks/pablo-reyes8/implementing-gpt)
+![Stars](https://img.shields.io/github/stars/pablo-reyes8/implementing-gpt)
+
+
 This repository contains a clean-room implementation of GPT-style decoder-only language models (GPT-2 and GPT-3 configurations) plus the utilities required to train, evaluate, and deploy them. It is designed as a pedagogical yet production-ready reference: every block is explicitly defined, the training loop exposes the key hyper-parameters (warmup, cosine decay, AdamW with GPT-3 betas, gradient clipping, weight decay), and both notebook- and script-based workflows are supported.
 
 ## Why GPT Still Matters

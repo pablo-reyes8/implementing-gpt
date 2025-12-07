@@ -227,4 +227,4 @@ If you use this codebase in academic or industrial work, please cite the origina
 
 ## License
 
-This project is released under the MIT License. See `LICENSE` (or include in your fork) for the full text before redistributing or deploying derived models.
+This project is released under the MIT License. See [LICENSE](LICENSE) (or include in your fork) for the full text before redistributing or deploying derived models.

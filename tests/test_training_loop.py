@@ -42,3 +42,36 @@ def test_train_gpt_lm_runs_on_cpu(tmp_path):
 
     assert len(history["train_loss"]) == 1
     assert ckpt_path.exists()
+
+
+def test_train_gpt_lm_honors_max_steps(tmp_path):
+    vocab_size = 32
+    block_size = 8
+    train_loader = _make_loader(vocab_size, block_size, num_batches=8)
+
+    model = GPT2(
+        vocab_size=vocab_size,
+        block_size=block_size,
+        n_layer=1,
+        n_head=2,
+        d_model=32,
+        dropout=0.0,
+    )
+
+    ckpt_path = tmp_path / "tiny_model_steps.pt"
+    history = train_gpt_lm(
+        model,
+        train_loader,
+        val_loader=None,
+        epochs=3,
+        max_steps=2,
+        base_lr=1e-3,
+        device="cpu",
+        ckpt_path=str(ckpt_path),
+        log_every=10,
+        amp_enabled=False,
+        gpt_version="gpt2",
+        save_ckpt_every=1,
+    )
+
+    assert history["global_steps"] == 2

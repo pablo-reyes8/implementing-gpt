@@ -25,11 +25,12 @@ Even with tiny parameter counts, cosine LR decay + AdamW betas (0.9, 0.95) stabi
 
 ```
 .
-├── scripts/                 # CLI entrypoints (training & inference)
+├── scripts/                 # CLI entrypoints (training, inference, compare, ablations)
 ├── src/
 │   ├── data/                # Tokenizer + dataset builders
 │   ├── inference/           # Sampling utilities
 │   ├── model/               # Attention, GPT blocks, GPT2/GPT3 classes
+│   ├── research/            # Reusable experiment runner + result exporters
 │   └── training/            # Optimizer presets, schedulers, main loop, AMP helpers
 ├── tests/                   # Pytest suite covering blocks, models, schedulers, training loop
 ├── training_showcase/       # Jupyter notebooks with exploratory runs
@@ -103,6 +104,13 @@ model = GPT3(
 
 All parameters are exposed through `scripts/train.py`, so you can mix-and-match presets with your hardware budget.
 
+Research variants included in this repo:
+- `RMSNorm` (`--norm-type rmsnorm`)
+- `SwiGLU` feed-forward (`--mlp-type swiglu`)
+- RoPE positional encoding (`--pos-encoding rope`)
+- PyTorch SDPA backend (`--attention-impl sdpa`)
+- Gradient checkpointing (`--gradient-checkpointing`)
+
 ## Installation
 
 > **Note:** Training GPT-3-sized models is computationally expensive. Expect to need multiple high-memory GPUs for anything beyond the smallest configs.
@@ -140,33 +148,78 @@ Each loader handles tokenizer training/loading, dataset chunking, and dataloader
 python scripts/train.py \
   --dataset small \
   --model-version gpt3 \
+  --model-preset small \
   --block-size 256 \
-  --n-layer 8 \
-  --n-head 8 \
-  --d-model 512 \
-  --epochs 10 \
+  --epochs 3 \
+  --max-steps 2000 \
   --batch-size 32 \
+  --norm-type rmsnorm \
+  --mlp-type swiglu \
+  --pos-encoding rope \
+  --attention-impl sdpa \
+  --gradient-checkpointing \
   --val-checking \
   --output-dir checkpoints \
-  --ckpt-name gpt3-mini.pt
+  --run-name gpt3_research_baseline
 ```
 
 Key switches:
 
 - `--dataset {small,large}` toggles OpenWebText-10k vs WikiText-103 loaders.
 - `--model-version {gpt2,gpt3}` automatically adjusts weight decay, betas, warmup, gradient clipping, and cosine scheduler settings.
+- `--max-steps N` enables fair compute-matched comparisons across architectures.
+- `--norm-type`, `--mlp-type`, `--pos-encoding`, `--attention-impl` enable architecture ablations.
+- `--gradient-checkpointing` and `--compile` help scale to larger configs on fixed VRAM.
 - `--preview-every N` enables teacher-forced previews mid-training (requires tokenizer decode).
 - `--amp --amp-dtype fp16` to enable autocast + GradScaler.
 
 All arguments can be inspected via `python scripts/train.py --help`.
 
+### Controlled GPT-2 vs GPT-3 Comparison
+
+```bash
+python scripts/compare_models.py \
+  --dataset small \
+  --models gpt2 gpt3 \
+  --seeds 42 43 44 \
+  --n-layer 8 \
+  --n-head 8 \
+  --d-model 512 \
+  --epochs 3 \
+  --max-steps 2000 \
+  --val-checking \
+  --experiment-name gpt2_vs_gpt3_equal_budget
+```
+
+This writes per-run artifacts plus aggregate `results.jsonl` and `results.csv` for plotting/statistics.
+
+### Architecture Ablations
+
+```bash
+python scripts/run_ablations.py \
+  --model-version gpt3 \
+  --dataset small \
+  --ablation-axis norm_type \
+  --ablation-values layernorm rmsnorm \
+  --seeds 42 43 \
+  --n-layer 8 \
+  --n-head 8 \
+  --d-model 512 \
+  --epochs 3 \
+  --max-steps 2000 \
+  --val-checking \
+  --experiment-name norm_ablation_gpt3
+```
+
+Typical axes: `norm_type`, `mlp_type`, `pos_encoding`, `attention_impl`, `gradient_checkpointing`, `dropout`.
+
 ### Text Generation
 
 ```bash
 python scripts/generate.py \
-  --checkpoint checkpoints/gpt3-mini.pt \
+  --checkpoint checkpoints/gpt3_research_baseline.last.pt \
   --tokenizer-path owt10k_tokenizer.json \
-  --model-version gpt3 \
+  --use-ckpt-config \
   --prompt "What's your name?" \
   --strategy topk \
   --top-k 50 \

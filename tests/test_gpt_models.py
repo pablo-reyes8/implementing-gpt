@@ -36,3 +36,25 @@ def test_gpt3_forward_matches_shapes():
     assert logits.shape == (x.size(0), block_size, vocab_size)
     assert loss is not None and loss.dim() == 0
     assert model.lm_head.weight.data_ptr() == model.emb.tok_emb.weight.data_ptr()
+
+
+def test_gpt3_research_variants_forward_matches_shapes():
+    vocab_size = 64
+    block_size = 16
+    model = GPT3(
+        vocab_size=vocab_size,
+        block_size=block_size,
+        n_layer=2,
+        n_head=4,
+        d_model=64,
+        dropout=0.0,
+        resid_dropout=0.0,
+        norm_type="rmsnorm",
+        mlp_type="swiglu",
+        pos_encoding="rope",
+        attention_impl="sdpa",
+    )
+    x = _dummy_batch(vocab_size, block_size)
+    logits, loss = model(x, x)
+    assert logits.shape == (x.size(0), block_size, vocab_size)
+    assert loss is not None and loss.dim() == 0

@@ -81,6 +81,8 @@ def _load_step_payload(step: dict, *, project_root: Path) -> tuple[str, Path, di
             raise PipelineConfigError(f"Step '{step_id}' sin 'script' en config {stage_config_path}")
         args = stage_cfg.get("args", {})
         script_path = resolve_path(script_rel, base_dir=project_root)
+        if not script_path.exists():
+            raise PipelineConfigError(f"Script no encontrado para step '{step_id}': {script_path}")
         return step_id, script_path, args
 
     script_rel = step.get("script")
@@ -88,6 +90,8 @@ def _load_step_payload(step: dict, *, project_root: Path) -> tuple[str, Path, di
         raise PipelineConfigError(f"Step '{step_id}' requiere 'script' o 'config'")
     args = step.get("args", {})
     script_path = resolve_path(script_rel, base_dir=project_root)
+    if not script_path.exists():
+        raise PipelineConfigError(f"Script no encontrado para step '{step_id}': {script_path}")
     return step_id, script_path, args
 
 

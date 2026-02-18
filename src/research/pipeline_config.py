@@ -104,9 +104,15 @@ def run_pipeline_config(
 ) -> dict:
     config_path = Path(config_path).resolve()
     cfg = load_yaml(config_path)
-
-    config_dir = config_path.parent
-    project_root = resolve_path(cfg.get("project_root", "."), base_dir=config_dir)
+    raw_project_root = cfg.get("project_root")
+    if raw_project_root is None:
+        project_root = Path.cwd().resolve()
+    else:
+        candidate_root = Path(raw_project_root)
+        if candidate_root.is_absolute():
+            project_root = candidate_root
+        else:
+            project_root = (Path.cwd() / candidate_root).resolve()
 
     run_name = str(cfg.get("name", "pipeline_run"))
     default_run_dir = f"research_runs/pipeline/{run_name}"

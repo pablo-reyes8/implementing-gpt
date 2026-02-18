@@ -12,12 +12,13 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from src.data.dataset_registry import dataset_choices
 from src.research.common import load_dataloaders, run_single_experiment, write_csv, write_jsonl
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Ejecuta ablations controladas sobre una base GPT.")
-    parser.add_argument("--dataset", choices=["small", "large"], default="small")
+    parser.add_argument("--dataset", choices=dataset_choices(), default="small")
     parser.add_argument("--block-size", type=int, default=256)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--num-workers", type=int, default=2)

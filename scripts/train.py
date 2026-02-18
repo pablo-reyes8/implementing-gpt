@@ -17,13 +17,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from src.data.dataset_registry import DATASET_LOADERS, dataset_choices, dataset_help_lines
 from src.model.gpt_model import GPT2, GPT3
 from src.training.main_loop import train_gpt_lm
-
-DATASET_LOADERS = {
-    "small": "src.data.load_small_data",
-    "large": "src.data.load_large_data",
-}
 
 MODEL_PRESETS = {
     "nano": {"n_layer": 4, "n_head": 4, "d_model": 256},
@@ -57,15 +53,16 @@ def parse_args() -> argparse.Namespace:
         description=(
             "Entrena un modelo GPT-2/GPT-3 con opciones de investigación "
             "(ablation-friendly y reproducible)."
-        )
+        ),
+        formatter_class=argparse.RawTextHelpFormatter,
     )
 
     data = parser.add_argument_group("Data")
     data.add_argument(
         "--dataset",
-        choices=DATASET_LOADERS.keys(),
+        choices=dataset_choices(),
         default="small",
-        help="Qué dataloader usar (small=openwebtext10k, large=wikitext-103).",
+        help="Dataloader a usar.\n" + dataset_help_lines(),
     )
     data.add_argument("--block-size", type=int, default=256)
     data.add_argument("--batch-size", type=int, default=32)

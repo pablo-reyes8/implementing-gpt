@@ -25,7 +25,7 @@ Even with tiny parameter counts, cosine LR decay + AdamW betas (0.9, 0.95) stabi
 
 ```
 .
-├── scripts/                 # CLI entrypoints (training, inference, compare, ablations)
+├── scripts/                 # CLI entrypoints (training, inference, compare, ablations, plotting)
 ├── src/
 │   ├── data/                # Tokenizer + dataset builders
 │   ├── inference/           # Sampling utilities
@@ -133,12 +133,39 @@ Research variants included in this repo:
 
 ## Datasets
 
-Two dataset modules are provided:
+The project now ships multiple corpus loaders for GPT pretraining research:
 
-- **OpenWebText-10k (`src/data/load_small_data.py`)** – mirrors the GPT-2 training distribution with ~10k documents for quick experiments.
-- **WikiText-103 (`src/data/load_large_data.py`)** – a larger, high-quality corpus suitable for scaling to deeper models.
+- `small` -> OpenWebText-10K (`src/data/load_small_data.py`)
+- `large` -> WikiText-103 (`src/data/load_large_data.py`)
+- `wikitext2` -> WikiText-2 (`src/data/load_wikitext2_data.py`)
+- `tinystories` -> TinyStories (`src/data/load_tinystories_data.py`)
+- `openwebtext` -> OpenWebText full (`src/data/load_openwebtext_data.py`)
+- `c4_en` -> C4 English (`src/data/load_c4_data.py`)
+- `pile` -> The Pile (uncopyrighted) (`src/data/load_pile_data.py`)
+- `redpajama` -> RedPajama 1T sample (`src/data/load_redpajama_data.py`)
+- `local_jsonl` -> Local JSONL/TXT corpus (`src/data/load_local_jsonl_data.py`)
 
-Each loader handles tokenizer training/loading, dataset chunking, and dataloader creation.
+List available options with:
+
+```bash
+python scripts/list_datasets.py
+```
+
+Build and inspect dataloaders for any registered option:
+
+```bash
+python scripts/build_dataloaders.py --dataset tinystories --preview-batches 2
+```
+
+Datasets are not downloaded until you run a loader through `train.py`, `compare_models.py`, or `run_ablations.py`.
+
+For local corpora (`local_jsonl`):
+
+```bash
+export LOCAL_TEXT_DATA_PATH=/path/to/corpus.jsonl
+export LOCAL_TEXT_DATA_FORMAT=json
+export LOCAL_TEXT_FIELD=text
+```
 
 ## Running the Pipeline
 
@@ -165,7 +192,7 @@ python scripts/train.py \
 
 Key switches:
 
-- `--dataset {small,large}` toggles OpenWebText-10k vs WikiText-103 loaders.
+- `--dataset ...` supports OpenWebText, WikiText, TinyStories, C4, Pile, RedPajama, and local corpora.
 - `--model-version {gpt2,gpt3}` automatically adjusts weight decay, betas, warmup, gradient clipping, and cosine scheduler settings.
 - `--max-steps N` enables fair compute-matched comparisons across architectures.
 - `--norm-type`, `--mlp-type`, `--pos-encoding`, `--attention-impl` enable architecture ablations.
@@ -212,6 +239,26 @@ python scripts/run_ablations.py \
 ```
 
 Typical axes: `norm_type`, `mlp_type`, `pos_encoding`, `attention_impl`, `gradient_checkpointing`, `dropout`.
+
+### Plotting Results
+
+```bash
+python scripts/plot_results.py \
+  --results research_runs/compare/gpt2_vs_gpt3_equal_budget/results.jsonl \
+  --kind compare \
+  --metric val_loss_best \
+  --output-dir research_runs/plots
+```
+
+For ablations:
+
+```bash
+python scripts/plot_results.py \
+  --results research_runs/ablations/norm_ablation_gpt3/results.csv \
+  --kind ablation \
+  --metric val_loss_best \
+  --output-dir research_runs/plots
+```
 
 ### Text Generation
 

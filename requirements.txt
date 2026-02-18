@@ -4,3 +4,4 @@ datasets>=2.17.0
 tokenizers>=0.15.0
 termcolor>=2.4.0
 pytest>=8.0.0
+matplotlib>=3.8.0

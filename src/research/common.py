@@ -9,13 +9,9 @@ from pathlib import Path
 
 import torch
 
+from src.data.dataset_registry import DATASET_LOADERS
 from src.model.gpt_model import GPT2, GPT3
 from src.training.main_loop import train_gpt_lm
-
-DATASET_LOADERS = {
-    "small": "src.data.load_small_data",
-    "large": "src.data.load_large_data",
-}
 
 
 def set_seed(seed: int) -> None:

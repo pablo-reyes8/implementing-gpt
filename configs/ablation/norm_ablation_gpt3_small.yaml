@@ -1,0 +1,20 @@
+name: norm_ablation_gpt3_small
+script: scripts/run_ablations.py
+args:
+  model-version: gpt3
+  dataset: small
+  ablation-axis: norm_type
+  ablation-values: [layernorm, rmsnorm]
+  seeds: [42, 43]
+  n-layer: 8
+  n-head: 8
+  d-model: 512
+  block-size: 256
+  batch-size: 32
+  epochs: 3
+  max-steps: 2000
+  val-checking: true
+  output-dir: research_runs/ablations
+  experiment-name: norm_ablation_gpt3_small
+  device: cpu
+  amp: false

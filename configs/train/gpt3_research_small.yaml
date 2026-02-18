@@ -1,0 +1,22 @@
+name: gpt3_research_small
+script: scripts/train.py
+args:
+  dataset: small
+  model-version: gpt3
+  model-preset: small
+  block-size: 256
+  batch-size: 32
+  num-workers: 2
+  epochs: 3
+  max-steps: 2000
+  base-lr: 0.0003
+  val-checking: true
+  norm-type: rmsnorm
+  mlp-type: swiglu
+  pos-encoding: rope
+  attention-impl: sdpa
+  gradient-checkpointing: true
+  output-dir: checkpoints
+  run-name: gpt3_research_small
+  amp: false
+  device: cpu

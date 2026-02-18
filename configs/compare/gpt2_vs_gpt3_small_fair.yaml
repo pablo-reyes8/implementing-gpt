@@ -1,0 +1,18 @@
+name: gpt2_vs_gpt3_small_fair
+script: scripts/compare_models.py
+args:
+  dataset: small
+  models: [gpt2, gpt3]
+  seeds: [42, 43, 44]
+  n-layer: 8
+  n-head: 8
+  d-model: 512
+  block-size: 256
+  batch-size: 32
+  epochs: 3
+  max-steps: 2000
+  val-checking: true
+  output-dir: research_runs/compare
+  experiment-name: gpt2_vs_gpt3_small_fair
+  device: cpu
+  amp: false

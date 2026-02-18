@@ -1,0 +1,22 @@
+name: research_small_repro
+project_root: .
+run_dir: research_runs/pipeline_research_small_repro
+env:
+  PYTHONUNBUFFERED: "1"
+
+steps:
+  - id: compare
+    enabled: true
+    config: configs/compare/gpt2_vs_gpt3_small_fair.yaml
+
+  - id: ablation
+    enabled: true
+    config: configs/ablation/norm_ablation_gpt3_small.yaml
+
+  - id: plot_compare
+    enabled: true
+    config: configs/plot/compare_plot.yaml
+
+  - id: plot_ablation
+    enabled: true
+    config: configs/plot/ablation_plot.yaml

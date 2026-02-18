@@ -1,0 +1,10 @@
+name: ablation_plot
+script: scripts/plot_results.py
+args:
+  results:
+    - research_runs/ablations/norm_ablation_gpt3_small/results.jsonl
+  kind: ablation
+  metric: val_loss_best
+  output-dir: research_runs/plots
+  plot-name: ablation_norm_gpt3_small.png
+  summary-csv: research_runs/plots/summary_ablation_norm_small.csv

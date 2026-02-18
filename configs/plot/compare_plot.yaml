@@ -1,0 +1,10 @@
+name: compare_plot
+script: scripts/plot_results.py
+args:
+  results:
+    - research_runs/compare/gpt2_vs_gpt3_small_fair/results.jsonl
+  kind: compare
+  metric: val_loss_best
+  output-dir: research_runs/plots
+  plot-name: compare_gpt2_vs_gpt3_small_fair.png
+  summary-csv: research_runs/plots/summary_compare_small.csv

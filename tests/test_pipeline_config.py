@@ -44,15 +44,15 @@ args:
 
     pipeline_cfg = project_root / "configs" / "pipeline.yaml"
     pipeline_cfg.write_text(
-        """
+        f\"\"\"
 name: test_pipeline
-project_root: .
+project_root: {project_root}
 run_dir: runs/test_pipeline
 steps:
   - id: s1
     enabled: true
     config: configs/stage.yaml
-""".strip()
+\"\"\".strip()
         + "\n",
         encoding="utf-8",
     )

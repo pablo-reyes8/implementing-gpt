@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
@@ -23,6 +23,10 @@ class StepResult:
 
 class PipelineConfigError(RuntimeError):
     pass
+
+
+def utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def load_yaml(path: Path) -> dict:
@@ -152,7 +156,7 @@ def run_pipeline_config(
         _, script_path, step_args = _load_step_payload(step, project_root=project_root)
         cmd = _script_command(script_path, step_args)
 
-        started_at = datetime.utcnow().isoformat() + "Z"
+        started_at = utc_now_iso()
         print(f"\n>>> [{step_id}] {' '.join(cmd)}")
 
         if dry_run:
@@ -163,13 +167,13 @@ def run_pipeline_config(
                     returncode=0,
                     status="dry_run",
                     started_at=started_at,
-                    finished_at=datetime.utcnow().isoformat() + "Z",
+                    finished_at=utc_now_iso(),
                 )
             )
             continue
 
         proc = subprocess.run(cmd, cwd=project_root, env=env, check=False)
-        finished_at = datetime.utcnow().isoformat() + "Z"
+        finished_at = utc_now_iso()
 
         status = "ok" if proc.returncode == 0 else "failed"
         results.append(
@@ -193,10 +197,10 @@ def run_pipeline_config(
         "run_name": run_name,
         "dry_run": dry_run,
         "results": [result.__dict__ for result in results],
-        "finished_at": datetime.utcnow().isoformat() + "Z",
+        "finished_at": utc_now_iso(),
     }
 
-    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     summary_path = run_dir / f"execution_{ts}.json"
     with open(summary_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2)

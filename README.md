@@ -216,6 +216,17 @@ python scripts/run_pipeline_config.py \
 
 The runner stores execution reports in JSON under `run_dir`.
 
+## Packaging Checklist
+
+For a professional/reproducible run, keep these artifacts per pipeline execution:
+
+- pipeline YAML used (`configs/pipeline/*.yaml`)
+- per-stage YAMLs (`configs/train|compare|ablation|plot/*.yaml`)
+- metrics (`results.jsonl`, `results.csv`)
+- plots (`research_runs/plots/*.png`)
+- execution report (`run_dir/execution_*.json`)
+- environment metadata (Python, PyTorch, CUDA, git commit)
+
 ## Simple Airflow Orchestration
 
 DAG location:
